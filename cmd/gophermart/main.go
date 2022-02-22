@@ -1,9 +1,13 @@
 package main
 
-import "github.com/sbxb/loyalty/internal/logger"
+import (
+	"github.com/sbxb/loyalty/api"
+	"github.com/sbxb/loyalty/internal/logger"
+)
 
 func main() {
 	logger.SetLevel("DEBUG")
 
-	logger.Info("Hello world")
+	router := api.NewRouter()
+	_ = router
 }
