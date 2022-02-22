@@ -6,14 +6,20 @@ import (
 	"syscall"
 
 	"github.com/sbxb/loyalty/api"
+	"github.com/sbxb/loyalty/config"
 	"github.com/sbxb/loyalty/internal/logger"
 )
 
 func main() {
 	logger.SetLevel("DEBUG")
 
-	router := api.NewRouter()
-	server, _ := api.NewHTTPServer("localhost:8888", router)
+	cfg, err := config.New()
+	if err != nil {
+		logger.Fatalln(err)
+	}
+
+	router := api.NewRouter(cfg)
+	server, _ := api.NewHTTPServer(cfg.ServerAddress, router)
 	defer server.Close()
 
 	ctx, stop := signal.NotifyContext(
