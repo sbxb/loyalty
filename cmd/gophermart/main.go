@@ -8,7 +8,9 @@ import (
 	"github.com/sbxb/loyalty/api"
 	"github.com/sbxb/loyalty/config"
 	"github.com/sbxb/loyalty/internal/logger"
+	"github.com/sbxb/loyalty/storage"
 	"github.com/sbxb/loyalty/storage/inmemory"
+	"github.com/sbxb/loyalty/storage/psql"
 )
 
 func main() {
@@ -20,7 +22,12 @@ func main() {
 	}
 	logger.Info("Config parsed")
 
-	store, err := inmemory.NewMapStorage()
+	var store storage.Storage
+	if cfg.DatabaseDSN != "" {
+		store, err = psql.NewDBStorage(cfg.DatabaseDSN)
+	} else {
+		store, err = inmemory.NewMapStorage()
+	}
 	if err != nil {
 		logger.Fatalln(err)
 	}
