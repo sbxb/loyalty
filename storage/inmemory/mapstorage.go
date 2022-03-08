@@ -82,6 +82,35 @@ func (ms *MapStorage) AddOrder(ctx context.Context, order *models.Order, userID 
 	return nil
 }
 
+func (ms *MapStorage) GetOrders(ctx context.Context, userID int) ([]*models.Order, error) {
+	ms.Lock()
+	defer ms.Unlock()
+
+	res := []*models.Order{}
+
+	// TODO Sort orders by upload time ?
+	for key, payload := range ms.order {
+		parts := strings.SplitN(payload, "|", 4)
+		uid, _ := strconv.Atoi(parts[3])
+		if uid != userID {
+			continue
+		}
+		var err error
+		order := &models.Order{}
+		order.Number = key
+		order.Status = parts[0]
+		if order.Accrual, err = strconv.ParseInt(parts[1], 10, 64); err != nil {
+			return nil, fmt.Errorf("MapStorage: GetOrders: %v", err)
+		}
+		if order.Uploaded_at, err = time.Parse(time.RFC3339, parts[2]); err != nil {
+			return nil, fmt.Errorf("MapStorage: GetOrders: %v", err)
+		}
+		res = append(res, order)
+	}
+
+	return res, nil
+}
+
 func (ms *MapStorage) Close() error {
 	return nil
 }

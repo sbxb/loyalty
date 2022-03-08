@@ -62,40 +62,26 @@ func TestGetNonexistentUser(t *testing.T) {
 func TestAddOrder(t *testing.T) {
 	order := &models.Order{
 		Number: "12345678903",
-		Status: "NEW",
+		Status: models.OrderStatusNew,
 	}
 	userID := 1
 
 	store, _ := inmemory.NewMapStorage() // NewMapStorage never returns non-nil error
 
-	user := &models.User{
-		Login: "user",
-		Hash:  "abcdef",
-	}
-	err := store.AddUser(context.Background(), user)
-	require.NoError(t, err)
-
-	err = store.AddOrder(context.Background(), order, userID)
+	err := store.AddOrder(context.Background(), order, userID)
 	require.NoError(t, err)
 }
 
 func TestAddOrderExistsOwn(t *testing.T) {
 	order := &models.Order{
 		Number: "12345678903",
-		Status: "NEW",
+		Status: models.OrderStatusNew,
 	}
 	userID := 1
 
 	store, _ := inmemory.NewMapStorage() // NewMapStorage never returns non-nil error
 
-	user := &models.User{
-		Login: "user",
-		Hash:  "abcdef",
-	}
-	err := store.AddUser(context.Background(), user)
-	require.NoError(t, err)
-
-	err = store.AddOrder(context.Background(), order, userID)
+	err := store.AddOrder(context.Background(), order, userID)
 	require.NoError(t, err)
 
 	err = store.AddOrder(context.Background(), order, userID)
@@ -108,20 +94,13 @@ func TestAddOrderExistsOwn(t *testing.T) {
 func TestAddOrderExistsNotOwn(t *testing.T) {
 	order := &models.Order{
 		Number: "12345678903",
-		Status: "NEW",
+		Status: models.OrderStatusNew,
 	}
 	userID := 1
 
 	store, _ := inmemory.NewMapStorage() // NewMapStorage never returns non-nil error
 
-	user := &models.User{
-		Login: "user",
-		Hash:  "abcdef",
-	}
-	err := store.AddUser(context.Background(), user)
-	require.NoError(t, err)
-
-	err = store.AddOrder(context.Background(), order, userID)
+	err := store.AddOrder(context.Background(), order, userID)
 	require.NoError(t, err)
 
 	err = store.AddOrder(context.Background(), order, 2)
@@ -132,4 +111,51 @@ func TestAddOrderExistsNotOwn(t *testing.T) {
 
 	//store.DumpUser()
 	//store.DumpOrder()
+}
+
+func TestGetOrdersExistent(t *testing.T) {
+	orders := []*models.Order{
+		{
+			Number:  "12345",
+			Status:  "NEW",
+			Accrual: 0,
+		},
+		{
+			Number:  "67890",
+			Status:  "NEW",
+			Accrual: 0,
+		},
+	}
+
+	userID := 1
+
+	store, _ := inmemory.NewMapStorage() // NewMapStorage never returns non-nil error
+
+	for _, order := range orders {
+		err := store.AddOrder(context.Background(), order, userID)
+		require.NoError(t, err)
+	}
+
+	ordersReturned, err := store.GetOrders(context.Background(), userID)
+	require.NoError(t, err)
+	assert.NotEmpty(t, ordersReturned)
+	for i := range ordersReturned {
+		assert.True(t, ordersEqual(ordersReturned[i], orders[i]))
+	}
+
+}
+
+func TestGetOrdersNonExistent(t *testing.T) {
+	userID := 1
+	store, _ := inmemory.NewMapStorage() // NewMapStorage never returns non-nil error
+
+	ordersReturned, err := store.GetOrders(context.Background(), userID)
+	require.NoError(t, err)
+	assert.Empty(t, ordersReturned)
+}
+
+func ordersEqual(first, second *models.Order) bool {
+	return first.Number == second.Number &&
+		first.Status == second.Status &&
+		first.Accrual == second.Accrual
 }
