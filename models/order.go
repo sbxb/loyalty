@@ -14,6 +14,13 @@ type Order struct {
 	// Owner       string    `json:"-"`
 }
 
+const (
+	OrderStatusNew        = "NEW"
+	OrderStatusProcessing = "PROCESSING"
+	OrderStatusInvalid    = "INVALID"
+	OrderStatusProcessed  = "PROCESSED"
+)
+
 func (ord *Order) Validate() bool {
 	ord.Number = strings.TrimSpace(ord.Number)
 	if ord.Number == "" || !isAllDigits(ord.Number) {
