@@ -8,6 +8,7 @@ import (
 	"github.com/sbxb/loyalty/api"
 	"github.com/sbxb/loyalty/config"
 	"github.com/sbxb/loyalty/internal/logger"
+	"github.com/sbxb/loyalty/storage/inmemory"
 )
 
 func main() {
@@ -17,8 +18,16 @@ func main() {
 	if err != nil {
 		logger.Fatalln(err)
 	}
+	logger.Info("Config parsed")
 
-	router := api.NewRouter(cfg)
+	store, err := inmemory.NewMapStorage()
+	if err != nil {
+		logger.Fatalln(err)
+	}
+	logger.Info("Storage created")
+	defer store.Close()
+
+	router := api.NewRouter(store, cfg)
 	server, _ := api.NewHTTPServer(cfg.ServerAddress, router)
 	defer server.Close()
 
