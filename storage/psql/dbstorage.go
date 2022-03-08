@@ -167,6 +167,35 @@ func (st *DBStorage) AddOrder(ctx context.Context, order *models.Order, userID i
 	return storage.NewExistingOrderError(uid)
 }
 
+func (st *DBStorage) GetOrders(ctx context.Context, userID int) ([]*models.Order, error) {
+	res := []*models.Order{}
+
+	GetOrdersQuery := `SELECT number, status, accrual, uploaded_at FROM ` + st.orderTable + `
+		WHERE user_id = $1 ORDER BY uploaded_at ASC`
+
+	rows, err := st.db.QueryContext(ctx, GetOrdersQuery, userID)
+	if err != nil {
+		return nil, fmt.Errorf("DBStorage: GetOrders: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		order := &models.Order{}
+		err = rows.Scan(&order.Number, &order.Status, &order.Accrual, &order.Uploaded_at)
+		if err != nil {
+			return nil, fmt.Errorf("DBStorage: GetOrders: %v", err)
+		}
+		res = append(res, order)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return nil, fmt.Errorf("DBStorage: GetOrders: %v", err)
+	}
+
+	return res, nil
+}
+
 func (st *DBStorage) Close() error {
 	if st.db == nil {
 		return nil
