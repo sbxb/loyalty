@@ -6,10 +6,10 @@ import (
 )
 
 type Order struct {
-	Number      string    `json:"number"`
-	Status      string    `json:"status"`
-	Accrual     int64     `json:"accrual"`
-	Uploaded_at time.Time `json:"uploaded_at"`
+	Number     string    `json:"number"`
+	Status     string    `json:"status"`
+	Accrual    int64     `json:"accrual"`
+	UploadedAt time.Time `json:"uploaded_at"`
 	// Exists      bool      `json:"-"`
 	// Owner       string    `json:"-"`
 }

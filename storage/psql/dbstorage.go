@@ -181,7 +181,7 @@ func (st *DBStorage) GetOrders(ctx context.Context, userID int) ([]*models.Order
 
 	for rows.Next() {
 		order := &models.Order{}
-		err = rows.Scan(&order.Number, &order.Status, &order.Accrual, &order.Uploaded_at)
+		err = rows.Scan(&order.Number, &order.Status, &order.Accrual, &order.UploadedAt)
 		if err != nil {
 			return nil, fmt.Errorf("DBStorage: GetOrders: %v", err)
 		}

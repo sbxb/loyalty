@@ -2,10 +2,10 @@ package storage
 
 import "errors"
 
-var ErrLoginAlreadyExists = errors.New("Login already exists")
-var ErrLoginMissing = errors.New("Login missing")
+var ErrLoginAlreadyExists = errors.New("login already exists")
+var ErrLoginMissing = errors.New("login missing")
 
-var ErrOrderAlreadyExists = errors.New("Order already exists")
+var ErrOrderAlreadyExists = errors.New("order already exists")
 
 type ExistingOrderError struct {
 	Err    error

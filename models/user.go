@@ -36,7 +36,7 @@ func ReadUserFromBody(r io.Reader) (*User, error) {
 	}
 
 	if !user.Validate() {
-		return nil, errors.New("Bad request: login and/or password cannot be empty")
+		return nil, errors.New("bad request: login and/or password cannot be empty")
 	}
 
 	return user, nil

@@ -102,7 +102,7 @@ func (ms *MapStorage) GetOrders(ctx context.Context, userID int) ([]*models.Orde
 		if order.Accrual, err = strconv.ParseInt(parts[1], 10, 64); err != nil {
 			return nil, fmt.Errorf("MapStorage: GetOrders: %v", err)
 		}
-		if order.Uploaded_at, err = time.Parse(time.RFC3339, parts[2]); err != nil {
+		if order.UploadedAt, err = time.Parse(time.RFC3339, parts[2]); err != nil {
 			return nil, fmt.Errorf("MapStorage: GetOrders: %v", err)
 		}
 		res = append(res, order)

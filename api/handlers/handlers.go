@@ -93,7 +93,7 @@ func (uh URLHandler) UserPostOrder(w http.ResponseWriter, r *http.Request) {
 
 	order := models.Order{Number: string(body)}
 	if !order.Validate() {
-		//
+		return // TODO delete later
 	}
 
 }
