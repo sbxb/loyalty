@@ -71,9 +71,9 @@ func (c *Config) Validate() error {
 		return err
 	}
 
-	if err := ValidateServerAddress(c.AccrualAddress); err != nil {
-		return err
-	}
+	// if err := ValidateServerAddress(c.AccrualAddress); err != nil {
+	// 	return err
+	// }
 
 	// No need to validate c.DatabaseDSN, storage itself will do the job
 	return nil

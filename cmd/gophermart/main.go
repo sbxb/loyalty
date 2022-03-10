@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os/signal"
 	"syscall"
 
@@ -15,7 +14,6 @@ import (
 )
 
 func main() {
-	fmt.Println("XXX")
 	logger.SetLevel("DEBUG")
 
 	cfg, err := config.New()
