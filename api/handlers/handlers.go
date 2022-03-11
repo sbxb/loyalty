@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"io"
+	"encoding/json"
 	"net/http"
 
 	"github.com/sbxb/loyalty/config"
 	"github.com/sbxb/loyalty/internal/logger"
 	"github.com/sbxb/loyalty/models"
 	"github.com/sbxb/loyalty/services/auth"
+	"github.com/sbxb/loyalty/services/order"
 	"github.com/sbxb/loyalty/storage"
 )
 
@@ -16,6 +17,7 @@ type URLHandler struct {
 	store  storage.Storage
 	config config.Config
 	auth   *auth.AuthService
+	ord    *order.OrderService
 }
 
 func NewURLHandler(st storage.Storage, cfg config.Config) URLHandler {
@@ -23,6 +25,7 @@ func NewURLHandler(st storage.Storage, cfg config.Config) URLHandler {
 		store:  st,
 		config: cfg,
 		auth:   auth.NewAuthService(st),
+		ord:    order.NewOrderService(st),
 	}
 }
 
@@ -85,22 +88,35 @@ func (uh URLHandler) UserLogin(w http.ResponseWriter, r *http.Request) {
 
 // UserPostOrder process POST /api/user/orders request
 func (uh URLHandler) UserPostOrder(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Server failed to read the request's body", http.StatusInternalServerError)
+	order, orderErr := ReadOrderNumberFromBody(r.Body)
+	if orderErr != nil {
+		http.Error(w, orderErr.Error(), orderErr.Code)
 		return
 	}
-
-	order := models.Order{Number: string(body)}
-	if !order.Validate() {
-		return // TODO delete later
+	userID := auth.GetUserID(r.Context())
+	if orderRegErr := uh.ord.RegisterOrder(r.Context(), order, userID); orderRegErr != nil {
+		http.Error(w, orderRegErr.Error(), orderRegErr.Code)
+		return
 	}
-
+	w.WriteHeader(http.StatusAccepted)
 }
 
 // UserGetOrders process GET /api/user/orders request
 func (uh URLHandler) UserGetOrders(w http.ResponseWriter, r *http.Request) {
-	//
+	userID := auth.GetUserID(r.Context())
+	orderList, orderRegErr := uh.ord.ListOrders(r.Context(), userID)
+	if orderRegErr != nil {
+		http.Error(w, orderRegErr.Error(), orderRegErr.Code)
+		return
+	}
+	jr, err := json.Marshal(orderList)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jr)
 }
 
 // UserGetBalance process GET /api/user/balance request
