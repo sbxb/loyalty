@@ -7,10 +7,15 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/sbxb/loyalty/internal/logger"
 	"github.com/sbxb/loyalty/models"
 	"github.com/sbxb/loyalty/storage"
 	"golang.org/x/crypto/bcrypt"
 )
+
+type contextKey string
+
+var ContextUserKey = contextKey("user")
 
 type AuthService struct {
 	store storage.Storage
@@ -103,4 +108,13 @@ func (as *AuthService) SetCookie(w http.ResponseWriter, user *models.User) error
 	}
 	http.SetCookie(w, &cookie)
 	return nil
+}
+
+func GetUserID(ctx context.Context) int {
+	UserID, _ := ctx.Value(ContextUserKey).(int)
+	if UserID == 0 {
+		logger.Warning("User ID not found, check if authMW middleware was enabled")
+	}
+
+	return UserID
 }

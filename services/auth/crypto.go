@@ -122,3 +122,16 @@ func CheckSignedString(str string, key string) bool {
 
 	return hmac.Equal(newSign, sign)
 }
+
+func GetPayload(signedEncrypted string) (string, error) {
+	if !CheckSignedString(signedEncrypted, signatureKey) {
+		return "", errors.New("signature check failed")
+	}
+	encrypted := GetStringPart(signedEncrypted)
+	decrypted, err := decryptString(encrypted, secretKey)
+	if err != nil {
+		return "", errors.New("unable to decrypt the input string")
+	}
+
+	return decrypted, nil
+}

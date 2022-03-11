@@ -41,7 +41,7 @@ func isAllDigits(str string) bool {
 }
 
 // checkLuhn tests if a string containing only digits is a valid Luhn number
-func checkLuhn(str string) bool {
+func CheckLuhn(str string) bool {
 	sum := 0
 	even := false
 

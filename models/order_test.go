@@ -34,6 +34,6 @@ func TestCheckLuhn(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		assert.Equal(t, checkLuhn(tt.num), tt.want)
+		assert.Equal(t, CheckLuhn(tt.num), tt.want)
 	}
 }
