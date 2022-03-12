@@ -57,5 +57,6 @@ func (osv *OrderService) ListOrders(ctx context.Context, userID int) ([]*models.
 	if len(orders) == 0 {
 		return nil, NewOrderError("no orders found", http.StatusNoContent)
 	}
+	// TODO remove accrual if zero
 	return orders, nil
 }

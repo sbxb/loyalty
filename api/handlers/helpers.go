@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/sbxb/loyalty/internal/logger"
 	"github.com/sbxb/loyalty/models"
 )
 
@@ -30,7 +31,7 @@ func ReadOrderNumberFromBody(body io.ReadCloser) (*models.Order, *OrderPostError
 	}
 
 	order := &models.Order{Number: string(data)}
-
+	logger.Infof("%v\n", *order)
 	if !order.Validate() {
 		return nil, NewOrderPostError("wrong request format", http.StatusBadRequest)
 	}

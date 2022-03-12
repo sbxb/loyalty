@@ -32,7 +32,7 @@ func (ord *Order) Validate() bool {
 
 // isAllDigits tests if a string contains only digits
 func isAllDigits(str string) bool {
-	for r := range str {
+	for _, r := range str {
 		if r < '0' || r > '9' {
 			return false
 		}

@@ -88,6 +88,7 @@ func (uh URLHandler) UserLogin(w http.ResponseWriter, r *http.Request) {
 
 // UserPostOrder process POST /api/user/orders request
 func (uh URLHandler) UserPostOrder(w http.ResponseWriter, r *http.Request) {
+	logger.Info("UserPostOrder hit by POST /api/user/orders")
 	order, orderErr := ReadOrderNumberFromBody(r.Body)
 	if orderErr != nil {
 		http.Error(w, orderErr.Error(), orderErr.Code)
