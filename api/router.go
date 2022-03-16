@@ -23,9 +23,11 @@ func NewRouter(store storage.Storage, cfg config.Config) http.Handler {
 	router.With(mw.AuthMW).Post("/api/user/orders", urlHandler.UserPostOrder)
 	router.With(mw.AuthMW).Get("/api/user/orders", urlHandler.UserGetOrders)
 
-	router.Get("/api/user/balance", urlHandler.UserGetBalance)
-	router.Post("/api/user/balance/withdraw", urlHandler.UserBalanceWithdraw)
-	router.Get("/api/user/balance/withdrawals", urlHandler.UserGetWithdrawals)
+	router.With(mw.AuthMW).Get("/api/user/balance", urlHandler.UserGetBalance)
+	router.With(mw.AuthMW).Post("/api/user/balance/withdraw", urlHandler.UserBalanceWithdraw)
+	router.With(mw.AuthMW).Get("/api/user/balance/withdrawals", urlHandler.UserGetWithdrawals)
+
+	logger.Info("Routes loaded")
 
 	return router
 }
