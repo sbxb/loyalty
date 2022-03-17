@@ -23,15 +23,15 @@ const (
 
 func (ord *Order) Validate() bool {
 	ord.Number = strings.TrimSpace(ord.Number)
-	if ord.Number == "" || !isAllDigits(ord.Number) {
+	if ord.Number == "" || !IsAllDigits(ord.Number) {
 		return false
 	}
 
 	return true
 }
 
-// isAllDigits tests if a string contains only digits
-func isAllDigits(str string) bool {
+// IsAllDigits tests if a string contains only digits
+func IsAllDigits(str string) bool {
 	for _, r := range str {
 		if r < '0' || r > '9' {
 			return false
