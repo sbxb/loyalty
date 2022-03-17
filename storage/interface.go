@@ -15,5 +15,8 @@ type Storage interface {
 	GetBalance(ctx context.Context, userID int) (models.Balance, error)
 	GetWithdrawals(ctx context.Context, userID int) ([]*models.WithdrawalInfo, error)
 	GetUnprocessedOrders(ctx context.Context, limit int) ([]*models.Order, error)
+	UpdateOrderStatus(ctx context.Context, ar *models.AccrualResponse) error
+	ProcessOrder(ctx context.Context, ar *models.AccrualResponse) error
+	ProcessWithdraw(ctx context.Context, wr *models.WithdrawRequest, userID int) error
 	Close() error
 }

@@ -147,7 +147,7 @@ func (st *DBStorage) AddUser(ctx context.Context, user *models.User) error {
 	}
 
 	AddUserBalanceQuery := `INSERT INTO ` + st.balanceTable + `(user_id) VALUES($1)`
-	_, err = tx.ExecContext(ctx, AddUserBalanceQuery, userID)
+	_, err = tx.Exec(AddUserBalanceQuery, userID)
 	if err != nil {
 		return fmt.Errorf("DBStorage: AddUser: %v", err)
 	}
@@ -319,6 +319,105 @@ func (st *DBStorage) GetUnprocessedOrders(ctx context.Context, limit int) ([]*mo
 	}
 
 	return res, nil
+}
+
+func (st *DBStorage) UpdateOrderStatus(ctx context.Context, ar *models.AccrualResponse) error {
+	UpdateStatusQuery := `UPDATE ` + st.orderTable + ` SET status = $1 WHERE 
+		number = $2`
+	_, err := st.db.ExecContext(ctx, UpdateStatusQuery, ar.Status, ar.OrderNumber)
+	if err != nil {
+		// FIXME simple error is OK, isnt it?
+		return err
+	}
+
+	return nil
+}
+
+func (st *DBStorage) ProcessOrder(ctx context.Context, ar *models.AccrualResponse) error {
+	tx, err := st.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBStorage: ProcessOrder (0): %v", err)
+	}
+	defer tx.Rollback()
+
+	var userID int
+
+	// Get user_id of the order; lock the order row
+	SelectUserIDQuery := `SELECT user_id FROM ` + st.orderTable + ` WHERE 
+		number = $1 FOR UPDATE`
+	err = tx.QueryRow(SelectUserIDQuery, ar.OrderNumber).Scan(&userID)
+	if err != nil {
+		return fmt.Errorf("DBStorage: ProcessOrder (1): %v :: %v", ar, err)
+	}
+
+	var balance int64
+
+	// Get the current balance of the user; lock the user row
+	SelectBalanceQuery := `SELECT current FROM ` + st.balanceTable + ` WHERE 
+		user_id = $1 FOR UPDATE`
+	err = tx.QueryRow(SelectBalanceQuery, userID).Scan(&balance)
+	if err != nil {
+		return fmt.Errorf("DBStorage: ProcessOrder (2): %v :: %v", ar, err)
+	}
+
+	// Update the user balance; release the user row
+	UpdateBalanceQuery := `UPDATE ` + st.balanceTable + ` SET current = $1 
+		WHERE user_id = $2`
+	_, err = tx.Exec(UpdateBalanceQuery, balance+ar.Accrual, userID)
+	if err != nil {
+		return fmt.Errorf("DBStorage: ProcessOrder (3): %v :: %v", ar, err)
+	}
+
+	// Update the order status and accrual; release the order row
+	UpdateOrderQuery := `UPDATE ` + st.orderTable + ` SET status = $1, 
+		accrual = $2 WHERE number = $3`
+	_, err = tx.Exec(UpdateOrderQuery, ar.Status, ar.Accrual, ar.OrderNumber)
+	if err != nil {
+		return fmt.Errorf("DBStorage: ProcessOrder (4): %v :: %v", ar, err)
+	}
+
+	// Good luck with all the above mentioned stuff
+	return tx.Commit()
+}
+
+func (st *DBStorage) ProcessWithdraw(ctx context.Context, wr *models.WithdrawRequest, userID int) error {
+	tx, err := st.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("DBStorage: ProcessWithdraw (0): %v", err)
+	}
+	defer tx.Rollback()
+
+	var balance, withdrawn int64
+
+	// Get the current balance and the sum withdrawn of the user; lock the user row
+	SelectBalanceQuery := `SELECT current, withdrawn FROM ` + st.balanceTable + ` WHERE 
+		user_id = $1 FOR UPDATE`
+	err = tx.QueryRow(SelectBalanceQuery, userID).Scan(&balance, &withdrawn)
+	if err != nil {
+		return fmt.Errorf("DBStorage: ProcessOrder (1): %v :: %v", wr, err)
+	}
+
+	if balance < wr.Sum {
+		return storage.ErrInsufficientFunds
+	}
+
+	// Update the user balance and the sum withdrawn; release the user row
+	UpdateBalanceQuery := `UPDATE ` + st.balanceTable + ` SET current = $1, 
+		withdrawn = $2 WHERE user_id = $3`
+	_, err = tx.Exec(UpdateBalanceQuery, balance-wr.Sum, withdrawn+wr.Sum, userID)
+	if err != nil {
+		return fmt.Errorf("DBStorage: ProcessOrder (2): %v :: %v", wr, err)
+	}
+
+	UpdateWithdrawalsQuery := `INSERT INTO ` + st.withdrawalTable + `(number, 
+		withdrawn, user_id) VALUES($1, $2, $3)`
+	_, err = tx.Exec(UpdateWithdrawalsQuery, wr.OrderNumber, wr.Sum, userID)
+	if err != nil {
+		return fmt.Errorf("DBStorage: ProcessOrder (3): %v :: %v", wr, err)
+	}
+
+	// Good luck with all the above mentioned stuff
+	return tx.Commit()
 }
 
 func (st *DBStorage) Close() error {

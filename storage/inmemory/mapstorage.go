@@ -167,6 +167,24 @@ func (ms *MapStorage) GetUnprocessedOrders(ctx context.Context, limit int) ([]*m
 	return res, nil
 }
 
+func (ms *MapStorage) UpdateOrderStatus(ctx context.Context, ar *models.AccrualResponse) error {
+	//
+
+	return nil
+}
+
+func (ms *MapStorage) ProcessOrder(ctx context.Context, ar *models.AccrualResponse) error {
+	//
+
+	return nil
+}
+
+func (ms *MapStorage) ProcessWithdraw(ctx context.Context, wr *models.WithdrawRequest, userID int) error {
+	//
+
+	return nil
+}
+
 func (ms *MapStorage) Close() error {
 	return nil
 }
