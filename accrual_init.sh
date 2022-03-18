@@ -13,3 +13,6 @@ curl -X GET http://localhost:8888/api/orders/2253
 curl -H "Content-Type: application/json" -d '{"match": "ThirdBrand","reward": 5, "reward_type": "%"}' -X POST http://localhost:8888/api/goods
 curl -H "Content-Type: application/json" -d '{"order": "3376", "goods": [{"description": "Фонарь ThirdBrand", "price": 2000}, {"description": "Планшет ThirdBrand", "price": 5000}]}' -X POST http://localhost:8888/api/orders
 curl -X GET http://localhost:8888/api/orders/3376
+
+curl -H "Content-Type: application/json" -d '{"order": "5587", "goods": [{"description": "Пароварка FifthBrand", "price": 23000}, {"description": "Клавиатура FourthBrand", "price": 1500}]}' -X POST http://localhost:8888/api/orders
+curl -X GET http://localhost:8888/api/orders/5587
