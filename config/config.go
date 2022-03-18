@@ -8,7 +8,7 @@ import (
 
 const (
 	defaultServerAddress  = "localhost:8080"
-	defaultAccrualAddress = "localhost:8888"
+	defaultAccrualAddress = "http://localhost:8888"
 )
 
 // Config contains application settings

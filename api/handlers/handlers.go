@@ -30,7 +30,7 @@ func NewURLHandler(st storage.Storage, cfg config.Config) URLHandler {
 		config:  cfg,
 		auth:    auth.NewAuthService(st),
 		ord:     order.NewOrderService(st),
-		accrual: accrual.NewSimpleAccrualService(st),
+		accrual: accrual.NewSimpleAccrualService(st, cfg.AccrualAddress),
 	}
 }
 

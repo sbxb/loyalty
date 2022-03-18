@@ -1,7 +1,7 @@
 GM_PATH=cmd/gophermart
 GM_APP=gophermart
 GM_ADDRESS=localhost:8080
-ACCRUAL_ADDRESS=localhost:8888
+ACCRUAL_ADDRESS=http://localhost:8888
 
 .PHONY: run
 run:
