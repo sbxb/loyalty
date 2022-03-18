@@ -139,6 +139,10 @@ func (uh URLHandler) UserGetBalance(w http.ResponseWriter, r *http.Request) {
 	userID := auth.GetUserID(r.Context())
 
 	balance, err := uh.store.GetBalance(r.Context(), userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	// TODO divide currency ints by 100
 	jr, err := json.Marshal(balance)
 	if err != nil {
