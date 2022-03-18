@@ -1,0 +1,46 @@
+# Main test sequence:
+
+# register user, no cookies at this point
+curl -v -d '{"login": "user", "password": "pass"}' -X POST http://localhost:8080/api/user/register
+
+# try to register the same user again, no cookies at this point
+curl -v -d '{"login": "user", "password": "pass"}' -X POST http://localhost:8080/api/user/register
+
+# login user using cookie
+curl -v -b cookiefile -c cookiefile -d '{"login": "user", "password": "pass"}' -X POST http://localhost:8080/api/user/login
+
+# try to list users orders - empty at this point
+curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/orders
+
+# add order processed by accrual
+curl -v -b cookiefile -c cookiefile -d '1149' -X POST http://localhost:8080/api/user/orders
+
+# add order missing in accrual
+curl -v -b cookiefile -c cookiefile -d '4416' -X POST http://localhost:8080/api/user/orders
+
+# try to list users orders again - should have two orders
+curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/orders
+
+# try to get users balance - 4200;0
+curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/balance
+
+# add another order processed by accrual
+curl -v -b cookiefile -c cookiefile -d '3376' -X POST http://localhost:8080/api/user/orders
+
+# add one more order processed by accrual (no bonus)
+curl -v -b cookiefile -c cookiefile -d '5587' -X POST http://localhost:8080/api/user/orders
+
+# try to list users orders again - should have four orders
+curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/orders
+
+# try to get users balance - 4550;0
+curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/balance
+
+# try to get users withdrawals - nothing at this point
+curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/balance/withdrawals
+
+# try to withdraw 4500 - should be enough
+curl -v -b cookiefile -c cookiefile -d '{"order": "12345678903", "sum": 4500}' -X POST http://localhost:8080/api/user/balance/withdraw
+
+# try to withdraw 1000 - NOT ENOUGH
+curl -v -b cookiefile -c cookiefile -d '{"order": "2377225624", "sum": 1000}' -X POST http://localhost:8080/api/user/balance/withdraw
