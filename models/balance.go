@@ -69,19 +69,12 @@ type Balance struct {
 	Withdrawn Money `json:"withdrawn"`
 }
 
-// TODO check if ints will do instead of floats
-// type BalanceResponse struct {
-// 	Current   int64 `json:"current"`
-// 	Withdrawn int64 `json:"withdrawn"`
-// }
-
 type WithdrawalInfo struct {
 	OrderNumber string    `json:"order"`
 	Sum         Money     `json:"sum"`
 	ProcessedAt time.Time `json:"processed_at"`
 }
 
-// TODO check if ints will do instead of floats
 type WithdrawRequest struct {
 	OrderNumber string `json:"order"`
 	Sum         Money  `json:"sum"`

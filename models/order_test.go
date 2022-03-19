@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -71,18 +70,8 @@ func TestIsAllDigits(t *testing.T) {
 	}
 }
 
-func TestMakeLuhnNumbers(t *testing.T) {
-	t.Skip()
-	min := 1100
-	max := 9999
-	for i := min; i <= max; i++ {
-		res := CheckLuhn(fmt.Sprintf("%d", i))
-		if res {
-			t.Log(i)
-		}
-	}
-}
-
+// Valid order numbers for testing purposes
+//
 // 1149 1156 1172
 // 2238 2253 2279
 // 3327 3376 3384

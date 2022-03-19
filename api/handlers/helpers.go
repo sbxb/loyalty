@@ -13,8 +13,8 @@ type OrderPostError struct {
 	Code int
 }
 
-func (ae OrderPostError) Error() string {
-	return ae.msg
+func (ope OrderPostError) Error() string {
+	return ope.msg
 }
 
 func NewOrderPostError(msg string, code int) *OrderPostError {

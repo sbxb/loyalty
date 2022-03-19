@@ -16,18 +16,20 @@ func AuthMW(next http.Handler) http.Handler {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+
 		payload, err := auth.GetPayload(cookie.Value)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+
 		user := models.UserAuth{}
 		err = json.Unmarshal([]byte(payload), &user)
 		if err != nil || user.ID == 0 {
-			// TODO send server 500 ?
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+
 		ctx := context.WithValue(r.Context(), auth.ContextUserKey, user.ID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

@@ -10,8 +10,6 @@ type Order struct {
 	Status     string    `json:"status"`
 	Accrual    Money     `json:"accrual"`
 	UploadedAt time.Time `json:"uploaded_at"`
-	// Exists      bool      `json:"-"`
-	// Owner       string    `json:"-"`
 }
 
 const (

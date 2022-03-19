@@ -35,9 +35,6 @@ func NewURLHandler(st storage.Storage, cfg config.Config) URLHandler {
 }
 
 // UserRegister process POST /api/user/register request
-// ... Регистрация производится по паре логин/пароль. Каждый логин должен быть
-// уникальным. После успешной регистрации должна происходить автоматическая
-// аутентификация пользователя ...
 func (uh URLHandler) UserRegister(w http.ResponseWriter, r *http.Request) {
 	logger.Info("UserRegister hit by POST /api/user/register")
 
@@ -99,11 +96,13 @@ func (uh URLHandler) UserPostOrder(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, orderErr.Error(), orderErr.Code)
 		return
 	}
+
 	userID := auth.GetUserID(r.Context())
 	if orderRegErr := uh.ord.RegisterOrder(r.Context(), order, userID); orderRegErr != nil {
 		http.Error(w, orderRegErr.Error(), orderRegErr.Code)
 		return
 	}
+
 	go func() {
 		retry := uh.accrual.DoAccrualStuff(order.Number)
 		if retry {
@@ -111,6 +110,7 @@ func (uh URLHandler) UserPostOrder(w http.ResponseWriter, r *http.Request) {
 			_ = uh.accrual.DoAccrualStuff(order.Number)
 		}
 	}()
+
 	w.WriteHeader(http.StatusAccepted)
 }
 
@@ -118,16 +118,19 @@ func (uh URLHandler) UserPostOrder(w http.ResponseWriter, r *http.Request) {
 func (uh URLHandler) UserGetOrders(w http.ResponseWriter, r *http.Request) {
 	logger.Info("UserGetOrders hit by GET /api/user/orders")
 	userID := auth.GetUserID(r.Context())
+
 	orderList, orderRegErr := uh.ord.ListOrders(r.Context(), userID)
 	if orderRegErr != nil {
 		http.Error(w, orderRegErr.Error(), orderRegErr.Code)
 		return
 	}
+
 	jr, err := json.Marshal(orderList)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jr)
@@ -143,12 +146,13 @@ func (uh URLHandler) UserGetBalance(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// TODO divide currency ints by 100
+
 	jr, err := json.Marshal(balance)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jr)
@@ -164,6 +168,7 @@ func (uh URLHandler) UserBalanceWithdraw(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	if !req.Validate() {
 		http.Error(w, "wrong number format", http.StatusUnprocessableEntity)
 		return
@@ -186,20 +191,24 @@ func (uh URLHandler) UserBalanceWithdraw(w http.ResponseWriter, r *http.Request)
 func (uh URLHandler) UserGetWithdrawals(w http.ResponseWriter, r *http.Request) {
 	logger.Info("UserGetWithdrawals hit by GET /api/user/balance/withdrawals")
 	userID := auth.GetUserID(r.Context())
+
 	withdrawals, err := uh.store.GetWithdrawals(r.Context(), userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	if len(withdrawals) == 0 {
 		http.Error(w, "no withdrawals", http.StatusNoContent)
 		return
 	}
+
 	jr, err := json.Marshal(withdrawals)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jr)
