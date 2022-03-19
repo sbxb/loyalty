@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type TsNumber struct {
+type TSNumber struct {
 	Accrual Money `json:"accrual"`
 }
 
@@ -54,7 +54,7 @@ func TestConvertToJSON(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tj := TsNumber{tt.cents}
+		tj := TSNumber{tt.cents}
 		jc, err := json.Marshal(tj)
 		if err != nil {
 			t.Log(err)
@@ -112,7 +112,7 @@ func TestConvertFromJSON(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		var res TsNumber
+		var res TSNumber
 		err := json.Unmarshal([]byte(tt.json), &res)
 		if err != nil {
 			t.Log(err)
