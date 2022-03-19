@@ -152,22 +152,6 @@ func (st *DBStorage) AddUser(ctx context.Context, user *models.User) error {
 		return fmt.Errorf("DBStorage: AddUser: %v", err)
 	}
 
-	// AddURLQuery := `INSERT INTO ` + st.userTable + `(login, hash) VALUES($1, $2)`
-	// result, err := st.db.ExecContext(ctx, AddURLQuery, user.Login, user.Hash)
-	// if err != nil {
-	// 	if strings.Contains(err.Error(), "SQLSTATE 23505") {
-	// 		return storage.ErrLoginAlreadyExists
-	// 	}
-	// 	return fmt.Errorf("DBStorage: AddUser: %v", err)
-	// }
-	// rows, err := result.RowsAffected()
-	// if err != nil {
-	// 	return fmt.Errorf("DBStorage: AddUser: %v", err)
-	// }
-	// if rows != 1 {
-	// 	return fmt.Errorf("DBStorage: AddUser: expected to affect 1 row, affected %d", rows)
-	// }
-
 	return tx.Commit()
 }
 

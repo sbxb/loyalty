@@ -3,9 +3,39 @@ package config
 import (
 	"errors"
 	"net"
+	"net/url"
 	"regexp"
 	"strconv"
 )
+
+func ValidateURL(u string) error {
+	if u == "" {
+		return errors.New("empty URL")
+	}
+	urlObj, err := url.Parse(u)
+	if err != nil {
+		return err
+	}
+
+	if urlObj.Scheme == "" || urlObj.Host == "" {
+		return errors.New("invalid URL, wrong scheme or host or both")
+	}
+
+	port := urlObj.Port()
+	if port != "" && !isPortNumberValid(port) {
+		return errors.New("invalid URL, wrong port number")
+	}
+
+	host := urlObj.Hostname()
+
+	if isHostValidIP(host) {
+		return nil
+	} else if isHostnameSomewhatValid(host) {
+		return nil
+	}
+
+	return errors.New("invalid host")
+}
 
 func ValidateServerAddress(address string) error {
 	host, port, err := net.SplitHostPort(address)
