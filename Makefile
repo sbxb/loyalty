@@ -1,7 +1,8 @@
 GM_PATH=cmd/gophermart
 GM_APP=gophermart
 GM_ADDRESS=localhost:8080
-ACCRUAL_ADDRESS=http://localhost:8888
+ACCRUAL_URL=http://localhost:8888
+ACCRUAL_ADDRESS=localhost:8888
 
 .PHONY: run
 run:
@@ -13,7 +14,7 @@ build:
 
 .PHONY: full
 full: build
-	./${GM_PATH}/${GM_APP} -a ${GM_ADDRESS} -d postgres://loyalty:loyalty@localhost/loyalty -r ${ACCRUAL_ADDRESS}
+	./${GM_PATH}/${GM_APP} -a ${GM_ADDRESS} -d postgres://loyalty:loyalty@localhost/loyalty -r ${ACCRUAL_URL}
 
 .PHONY: accrual
 accrual:

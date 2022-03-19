@@ -8,7 +8,7 @@ import (
 type Order struct {
 	Number     string    `json:"number"`
 	Status     string    `json:"status"`
-	Accrual    int64     `json:"accrual"`
+	Accrual    Money     `json:"accrual"`
 	UploadedAt time.Time `json:"uploaded_at"`
 	// Exists      bool      `json:"-"`
 	// Owner       string    `json:"-"`

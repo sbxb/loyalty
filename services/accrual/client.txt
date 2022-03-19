@@ -21,7 +21,7 @@ curl -v -b cookiefile -c cookiefile -d '4416' -X POST http://localhost:8080/api/
 # try to list users orders again - should have two orders
 curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/orders
 
-# try to get users balance - 4200;0
+# try to get users balance - 420;0
 curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/balance
 
 # add another order processed by accrual
@@ -33,14 +33,14 @@ curl -v -b cookiefile -c cookiefile -d '5587' -X POST http://localhost:8080/api/
 # try to list users orders again - should have four orders
 curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/orders
 
-# try to get users balance - 4550;0
+# try to get users balance - 455;0
 curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/balance
 
 # try to get users withdrawals - nothing at this point
 curl -v -b cookiefile -c cookiefile -X GET http://localhost:8080/api/user/balance/withdrawals
 
-# try to withdraw 4500 - should be enough
-curl -v -b cookiefile -c cookiefile -d '{"order": "12345678903", "sum": 4500}' -X POST http://localhost:8080/api/user/balance/withdraw
+# try to withdraw 450 - should be enough
+curl -v -b cookiefile -c cookiefile -d '{"order": "12345678903", "sum": 450}' -X POST http://localhost:8080/api/user/balance/withdraw
 
-# try to withdraw 1000 - NOT ENOUGH
-curl -v -b cookiefile -c cookiefile -d '{"order": "2377225624", "sum": 1000}' -X POST http://localhost:8080/api/user/balance/withdraw
+# try to withdraw 100 - NOT ENOUGH
+curl -v -b cookiefile -c cookiefile -d '{"order": "2377225624", "sum": 100}' -X POST http://localhost:8080/api/user/balance/withdraw

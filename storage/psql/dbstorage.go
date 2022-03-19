@@ -363,7 +363,7 @@ func (st *DBStorage) ProcessOrder(ctx context.Context, ar *models.AccrualRespons
 	// Update the user balance; release the user row
 	UpdateBalanceQuery := `UPDATE ` + st.balanceTable + ` SET current = $1 
 		WHERE user_id = $2`
-	_, err = tx.Exec(UpdateBalanceQuery, balance+ar.Accrual, userID)
+	_, err = tx.Exec(UpdateBalanceQuery, balance+int64(ar.Accrual), userID)
 	if err != nil {
 		return fmt.Errorf("DBStorage: ProcessOrder (3): %v :: %v", ar, err)
 	}
@@ -387,7 +387,7 @@ func (st *DBStorage) ProcessWithdraw(ctx context.Context, wr *models.WithdrawReq
 	}
 	defer tx.Rollback()
 
-	var balance, withdrawn int64
+	var balance, withdrawn models.Money
 
 	// Get the current balance and the sum withdrawn of the user; lock the user row
 	SelectBalanceQuery := `SELECT current, withdrawn FROM ` + st.balanceTable + ` WHERE 

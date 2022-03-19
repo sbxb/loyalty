@@ -103,9 +103,12 @@ func (ms *MapStorage) GetOrders(ctx context.Context, userID int) ([]*models.Orde
 		order := &models.Order{}
 		order.Number = key
 		order.Status = parts[0]
-		if order.Accrual, err = strconv.ParseInt(parts[1], 10, 64); err != nil {
+
+		var acc int64
+		if acc, err = strconv.ParseInt(parts[1], 10, 64); err != nil {
 			return nil, fmt.Errorf("MapStorage: GetOrders: %v", err)
 		}
+		order.Accrual = models.Money(acc)
 		if order.UploadedAt, err = time.Parse(time.RFC3339, parts[2]); err != nil {
 			return nil, fmt.Errorf("MapStorage: GetOrders: %v", err)
 		}
@@ -123,9 +126,12 @@ func (ms *MapStorage) GetBalance(ctx context.Context, userID int) (models.Balanc
 
 	for uid, payload := range ms.balance {
 		if uid == userID {
+			var current, withdrawn int64
 			parts := strings.SplitN(payload, "|", 2)
-			balance.Current, _ = strconv.ParseInt(parts[0], 10, 64)
-			balance.Withdrawn, _ = strconv.ParseInt(parts[1], 10, 64)
+			current, _ = strconv.ParseInt(parts[0], 10, 64)
+			balance.Current = models.Money(current)
+			withdrawn, _ = strconv.ParseInt(parts[1], 10, 64)
+			balance.Withdrawn = models.Money(withdrawn)
 		}
 	}
 
