@@ -46,11 +46,13 @@ func hashPassword(password string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return string(bytes), nil
 }
 
 func checkPassword(password string, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+
 	return err == nil
 }
 
@@ -72,10 +74,8 @@ func (as *AuthService) RegisterUser(ctx context.Context, user *models.User) *Aut
 }
 
 func (as *AuthService) LoginUser(ctx context.Context, user *models.User) (*models.User, *AuthError) {
-	//var err error
-
 	dbUser, err := as.store.GetUser(ctx, user)
-	//logger.Debugf("%#v %w", user, err)
+
 	if err != nil {
 		if errors.Is(err, storage.ErrLoginMissing) {
 			return nil, NewAuthError("Wrong login and/or password", http.StatusUnauthorized)
@@ -96,10 +96,12 @@ func (as *AuthService) SetCookie(w http.ResponseWriter, user *models.User) error
 	if err != nil {
 		return NewAuthError("Auth: SetCookie: JSON.Marshal() failed to serialize user", http.StatusInternalServerError)
 	}
+
 	encUserInfo, err := encryptString(string(b), secretKey)
 	if err != nil {
 		return NewAuthError("Auth: SetCookie: encryptString failed to encrypt user", http.StatusInternalServerError)
 	}
+
 	signedEncMessage := GetSignedString(encUserInfo, signatureKey)
 	cookie := http.Cookie{
 		Name:    "user",
@@ -107,6 +109,7 @@ func (as *AuthService) SetCookie(w http.ResponseWriter, user *models.User) error
 		Expires: time.Now().Add(1 * time.Hour),
 	}
 	http.SetCookie(w, &cookie)
+
 	return nil
 }
 

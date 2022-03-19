@@ -27,16 +27,19 @@ func NewSimpleAccrualService(st storage.Storage, address string) *SimpleAccrualS
 func (sas *SimpleAccrualService) DoAccrualStuff(orderNumber string) bool {
 	var retry bool
 	logger.Infof("DoAccrualStuff(): Trying to get " + sas.client.url + orderNumber)
+
 	resp, err := sas.client.client.Get(sas.client.url + orderNumber)
 	if err != nil {
 		logger.Infof("DoAccrualStuff(): Get request failed")
 		return retry
 	}
+
 	ar, clientErr := processResponse(resp)
 	if clientErr != nil {
 		logger.Warning("DoAccrualStuff: " + clientErr.Error())
 		return retry
 	}
+
 	logger.Infof("DoAccrualStuff(): got response %v", ar)
 	switch ar.Status {
 	case "REGISTERED":
