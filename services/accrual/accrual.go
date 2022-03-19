@@ -10,32 +10,32 @@ import (
 	"github.com/sbxb/loyalty/storage"
 )
 
-const (
-	QueueLength = 500 // Should not be less than 5
-	AddTimeout  = 100 * time.Millisecond
-)
-
 type Job struct {
 	orderNumber string
 	status      string
 }
+
+// Code below is not finished and not used anywhere !!!
+
+const (
+	QueueLength = 500 // Should not be less than 5
+	AddTimeout  = 100 * time.Millisecond
+)
 
 type AccrualService struct {
 	store          storage.Storage
 	address        string
 	newJobQueue    chan Job
 	updateJobQueue chan Job
-	ctx            context.Context // FIXME Wrong, pass as a parameter instead
 }
 
-func NewAccrualService(st storage.Storage, address string, ctx context.Context) *AccrualService {
+func NewAccrualService(st storage.Storage, address string) *AccrualService {
 	logger.Info("Accrual Service : created")
-	// TODO make context work
+
 	return &AccrualService{
 		store:          st,
 		newJobQueue:    make(chan Job, QueueLength),
 		updateJobQueue: make(chan Job, QueueLength),
-		ctx:            ctx,
 		address:        address,
 	}
 }
@@ -61,8 +61,8 @@ func (as *AccrualService) PrepareNewJobQueue() {
 	if limit == 0 {
 		limit = QueueLength - 2
 	}
-	orders, err := as.store.GetUnprocessedOrders(as.ctx, limit)
-	// TODO Stopped here
+	orders, err := as.store.GetUnprocessedOrders(context.TODO(), limit)
+	// TODO to be continued
 	_ = orders
 	_ = err
 }

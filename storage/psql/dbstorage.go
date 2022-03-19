@@ -310,8 +310,7 @@ func (st *DBStorage) UpdateOrderStatus(ctx context.Context, ar *models.AccrualRe
 		number = $2`
 	_, err := st.db.ExecContext(ctx, UpdateStatusQuery, ar.Status, ar.OrderNumber)
 	if err != nil {
-		// FIXME simple error is OK, isnt it?
-		return err
+		return fmt.Errorf("DBStorage: UpdateOrderStatus: %v", err)
 	}
 
 	return nil
